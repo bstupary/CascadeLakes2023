@@ -1,0 +1,295 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+###### Set up your WD and load your Workspace #######
+
+setwd("C:/Users/Blake Stuparyk/Desktop/CASCADE 2022")
+
+
+
+##### Packages needed #####
+library(vegan)
+
+
+
+```
+
+```{r}
+###### Load up abundance ######
+
+Casc22.abnd <-
+  read.csv(
+    "C:/Users/Blake Stuparyk/Desktop/CASCADE 2022/SEPT 28 - CORRECT CASC DENSITIES (Historical and 2022).csv",
+    row.names = 1,
+    stringsAsFactors = TRUE
+  )
+
+Casc22.meta <- read.csv("C:/Users/Blake Stuparyk/Desktop/CASCADE 2022/Casc22.meta.csv", stringsAsFactors= TRUE)
+
+
+str(Casc22.meta)
+
+View(Casc22.abnd)
+```
+
+```{r}
+###### Run Global NMDS #####
+library(vegan)
+set.seed(42)
+
+Global.Casc.NMDS <- metaMDS(Casc22.abnd,
+                            distance = 'bray',
+                            k = 2,
+                            trymax = 1000
+                            )
+
+Global.Casc.NMDS 
+
+ordiplot(Global.Casc.NMDS)
+
+```
+
+```{r}
+###### Visualize Global NMDS ###########
+
+```
+
+
+
+```{r}
+##### Pull out Coordinates using scores() ########
+
+Sites22 <- as.data.frame(scores(Global.Casc.NMDS, choices = c(1,2), display = "sites"))
+write.csv(Sites22, "Sites22 Coords.csv")
+
+## Tack on full lake name and year data
+
+Sites22$Lake <- Casc22.meta[,1]
+Sites22$Year <- Casc22.meta[,2]
+Sites22$FishStatus <- Casc22.meta[,3]
+
+
+
+Spp22 <- as.data.frame(scores(Global.Casc.NMDS, choices = c(1,2), display = "species"))
+
+
+write.csv(Spp22, "Spp22 Coords.csv")
+
+
+```
+
+```{r}
+####### Subset Lakes into data.frames and fish status ######
+
+####### Subset to make Bighorn coords dataframe ########
+Big22 <- Sites22[1:23,]
+
+BigStock <- Big22[1:10,]
+BigKill <- Big22[10:16,]
+BigAbsent <- Big22[16:23,]
+
+
+```
+
+```{r}
+####### Subset to make Harrison coords dataframe ######
+Har22 <- Sites22[24:40,]
+
+```
+
+```{r}
+####### Subset to make Pipit coords dataframe ######
+
+Pip22 <- Sites22[41:68,]
+
+PipStock <- Pip22[1:7,]
+PipKill <- Pip22[7:8,]
+PipAbsent <- Pip22[8:23,]
+```
+
+```{r}
+####### Subset to make Snowflake coords dataframe ######
+
+Snw22 <- Sites22[69:102,]
+
+SnwStock <- Snw22[1:13,]
+SnwKill <- Snw22[13:14,]
+SnwAbsent <- Snw22[14:33,]
+```
+
+```{r}
+####### Subset to make Snowflake coords dataframe ######
+
+Cntl22 <- Sites22[103:145,]
+```
+
+```{r}
+
+####### Create GGplots For Each Lake ###################
+library(ggplot2)
+library(GGally)
+library(ggsci)
+
+library(ggpp)
+library(ggrepel)
+library(ggstatsplot)
+library(cowplot)
+library(ggthemes)
+
+bighorn22 <- ggplot() +
+  theme_bw() +
+    theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      size = 40,
+      face = "bold",
+      hjust = 0.5,
+      margin = margin(0, 0, 12, 0, unit = "pt")
+    ),
+    plot.subtitle = element_text(
+      size = 20,
+      face = "italic",
+      hjust = 0.5,
+      margin = margin(0, 0, 0, 0, unit = "pt")
+    ),
+    axis.title = element_text(size = 20),
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    axis.text = element_text(size = 15, color = "#000000", face = "bold"),
+    panel.background = element_rect(fill = "transparent", colour = NA),
+    legend.box.background = element_rect(
+      fill = "transparent",
+      colour = "transparent",
+      size = 1.2
+    ),
+    legend.text = element_text(size = 15),
+    plot.tag = element_text(size = 30)
+  ) +
+  xlab("NMDS 1") +
+  ylab("NMDS 2") +
+  geom_text(data = Spp22,
+            aes(x = "NMDS1",
+                y = "NMDS2",
+                label = rownames(Spp22)),
+            fontface = "italic",
+            color = "black",
+            size = 6,
+            hjust = "outward")
+
+bighorn22
+
+
+```
+
+
+```{r}
+
+########### All but as facets? ########
+str(Sites22)
+
+
+All22 <- ggplot(data = Sites22,
+    mapping = aes(x = NMDS1,
+                  y = NMDS2),
+                  group = FishStatus,
+                  color = FishStatus
+  ) +
+  theme_bw() +
+  theme(
+    aspect.ratio = 1,
+    axis.title = element_text(size = 20),
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    axis.text = element_text(size = 15, color = "#000000", face = "bold"),
+    panel.background = element_rect(fill = "transparent", colour = NA),
+    legend.box.background = element_rect(
+      fill = "transparent",
+      colour = "transparent",
+      size = 1.2
+    ),
+    legend.text = element_text(size = 15),
+    plot.tag = element_text(size = 30)
+  ) +
+  xlab("NMDS 1") +
+  ylab("NMDS 2") +
+  geom_text(data = Spp22,aes(
+      x = NMDS1,
+      y = NMDS2,
+      label = rownames(Spp22)
+    ),
+    fontface = "italic",
+    color = "black",
+    size = 6,
+    hjust = "outward"
+  ) +
+  geom_path(
+    aes(
+      color = FishStatus,
+      group = Lake),
+      size = 1.5,
+      # arrow = arrow(ends = "last"),
+      show.legend = T
+    ) +
+      geom_text_repel(aes(label = Year)) +
+      geom_point(
+        col = "black",
+        pch = 21,
+        size = 3,
+        stroke = 1.4
+      ) +
+      stat_ellipse(
+        data = Cntl22,
+        linetype = 2,
+        size = 1.5
+      ) +
+      stat_ellipse(data = Cntl22,
+               geom = "polygon",
+               fill = "darkorchid2",
+               alpha = 0.3) 
+
+
+
+All22
+
+
+# x-range
+global.x.lims <- layer_scales(All22)$x$range$range
+
+#y-range
+global.y.lims <- layer_scales(All22)$y$range$range
+
+
+
+
+
+ggplot_build(All22)
+
+lakes <- c("Bighorn",
+"Harrison",
+"Pipit",
+"Snowflake",
+"Opabin",
+"Oesa",
+"Eiffel",
+"Hungabee",
+"Sentinel")
+
+```
+
