@@ -1,0 +1,13 @@
+,Trophic.Group,Feeding.Method,Body.Size,Reproduction,Pigmentation,Motility
+Acan.vern,Omnivore,Raptorial,S,Obligate sexual,NO,Rapid
+Alon.gutt,Herbivore,Filtration,S,Facultative asexual,YES,Slow
+Chyd.spha,Herbivore,Filtration,S,Facultative asexual,YES,Slow
+CYCLO,Omnivore,Raptorial,S,Obligate sexual,NO,Rapid
+Daph.midd,Herbivore,Filtration,L,Facultative asexual,YES,Slow
+Daph.pule,Herbivore,Filtration,M,Facultative asexual,YES,Slow
+Diac.thom,Carnivore,Raptorial,M,Obligate sexual,NO,Rapid
+EUCYC,Omnivore,Raptorial,M,Obligate sexual,NO,Rapid
+HARP,Omnivore,Raptorial,S,Obligate sexual,NO,Rapid
+Hesp.arct,Carnivore,Filtration,L,Obligate sexual,YES,Rapid
+Lept.tyrr,Herbivore,Filtration,M,Obligate sexual,YES,Rapid
+Macr.albi,Carnivore,Raptorial,L,Obligate sexual,YES,Rapid
